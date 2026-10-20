@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>鲜果优选 - 新鲜水果送到家</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="header">
+  <div class="header-top">
+    <div class="logo">🍎 鲜果优选</div>
+    <button class="user-btn" id="userBtn" onclick="openLogin()">登录/注册</button>
+  </div>
+  <div class="search-bar">
+    🔍 <input type="text" placeholder="搜索新鲜水果..." id="searchInput" oninput="renderProducts()">
+  </div>
+</div>
+
+<div class="page active" id="page-home">
+  <div class="banner">
+    <div>
+      <h2>今日特惠</h2>
+      <p>新鲜直采 · 当日送达</p>
+    </div>
+    <div class="banner-emoji">🍓</div>
+  </div>
+
+  <div class="category">
+    <div class="cat-item" onclick="filterCat('全部')"><div class="cat-icon">🛒</div><div class="cat-name">全部</div></div>
+    <div class="cat-item" onclick="filterCat('国产')"><div class="cat-icon">🍎</div><div class="cat-name">国产</div></div>
+    <div class="cat-item" onclick="filterCat('进口')"><div class="cat-icon">🥝</div><div class="cat-name">进口</div></div>
+    <div class="cat-item" onclick="filterCat('浆果')"><div class="cat-icon">🍓</div><div class="cat-name">浆果</div></div>
+    <div class="cat-item" onclick="filterCat('热带')"><div class="cat-icon">🥭</div><div class="cat-name">热带</div></div>
+  </div>
+
+  <div class="section-title">新鲜水果</div>
+  <div class="products" id="productList"></div>
+</div>
+
+<div class="page" id="page-cart">
+  <div class="section-title">我的购物车</div>
+  <div style="padding: 0 12px;" id="cartList"></div>
+</div>
+
+<div class="page" id="page-order">
+  <div id="bossBanner" class="boss-banner" style="display:none;">👑 老板后台模式：查看所有顾客订单</div>
+  <div class="section-title" id="orderTitle">我的订单</div>
+  <div style="padding: 0 12px;" id="orderList"></div>
+</div>
+
+<div class="page" id="page-me">
+  <div style="background: linear-gradient(135deg, #4caf50, #8bc34a); color: #fff; padding: 30px 20px; margin: 12px; border-radius: 12px;">
+    <div id="meInfo"></div>
+  </div>
+  <div style="background:#fff; margin:0 12px; border-radius:12px; padding:14px;">
+    <div style="padding:10px 0; border-bottom:1px solid #f0f0f0;" onclick="switchPage('order')">📦 我的订单</div>
+    <div style="padding:10px 0; border-bottom:1px solid #f0f0f0;">📍 收货地址</div>
+    <div style="padding:10px 0; border-bottom:1px solid #f0f0f0;">🎁 优惠券</div>
+    <div style="padding:10px 0;" id="logoutBtn" onclick="logout()">🚪 退出登录</div>
+  </div>
+</div>
+
+<div class="bottom-nav">
+  <div class="nav-item active" onclick="switchPage('home', this)">
+    <div class="nav-icon">🏠</div><div class="nav-text">首页</div>
+  </div>
+  <div class="nav-item" onclick="switchPage('cart', this)">
+    <div class="nav-icon">🛒</div><div class="nav-text">购物车</div>
+    <span class="cart-badge" id="cartBadge" style="display:none;">0</span>
+  </div>
+  <div class="nav-item" onclick="switchPage('order', this)">
+    <div class="nav-icon">📦</div><div class="nav-text">订单</div>
+  </div>
+  <div class="nav-item" onclick="switchPage('me', this)">
+    <div class="nav-icon">👤</div><div class="nav-text">我的</div>
+  </div>
+</div>
+
+<div class="modal-mask" id="loginModal">
+  <div class="modal">
+    <button class="close-btn" onclick="closeModal('loginModal')">×</button>
+    <h3 id="loginTitle">登录</h3>
+    <div style="background:#fff3e0; color:#e65100; padding:8px; border-radius:6px; font-size:12px; margin-bottom:12px; text-align:center;">
+      💡 老板测试账号：admin / 123456
+    </div>
+    <div class="form-group"><input type="text" id="loginPhone" placeholder="手机号/账号"></div>
+    <div class="form-group"><input type="password" id="loginPwd" placeholder="密码"></div>
+    <button class="btn-primary" onclick="doLogin()">登录</button>
+    <button class="btn-link" onclick="toggleRegister()">没有账号？立即注册</button>
+  </div>
+</div>
+
+<div class="modal-mask" id="registerModal">
+  <div class="modal">
+    <button class="close-btn" onclick="closeModal('registerModal')">×</button>
+    <h3>注册新账号</h3>
+    <div class="form-group"><input type="text" id="regName" placeholder="昵称"></div>
+    <div class="form-group"><input type="text" id="regPhone" placeholder="手机号"></div>
+    <div class="form-group"><input type="password" id="regPwd" placeholder="密码（至少6位）"></div>
+    <button class="btn-primary" onclick="doRegister()">注册</button>
+    <button class="btn-link" onclick="toggleRegister()">已有账号？去登录</button>
+  </div>
+</div>
+
+<div class="modal-mask" id="checkoutModal">
+  <div class="modal">
+    <button class="close-btn" onclick="closeModal('checkoutModal')">×</button>
+    <h3>确认订单</h3>
+    <div class="form-group"><input type="text" id="coName" placeholder="收货人姓名"></div>
+    <div class="form-group"><input type="text" id="coPhone" placeholder="联系电话"></div>
+    <div class="form-group"><input type="text" id="coAddr" placeholder="收货地址"></div>
+    <div style="background:#f9f9f9; padding:10px; border-radius:8px; margin-bottom:10px;">
+      <div id="coGoods" style="font-size:13px; color:#666;"></div>
+      <div style="margin-top:8px; text-align:right;">
+        合计：<span style="color:#ff5722; font-weight:bold; font-size:18px;" id="coTotal">¥0</span>
+      </div>
+    </div>
+    <button class="btn-primary" onclick="submitOrder()">提交订单</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="app.js" defer></script>
+
+</body>
+</html>
